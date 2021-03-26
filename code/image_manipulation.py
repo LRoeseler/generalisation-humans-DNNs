@@ -705,65 +705,69 @@ def degrade_images(img_path, out_dir=""):
     use_JPEG = False # either JPEG or PNG
     img = imload_rgb(img_path)
 
-    # grayscale
-    img_grayscale = rgb2gray(img)
-    if out_dir:
-        save_out = out_dir + "/"
-    save_out = out_dir + "degradations/" + "grayscale/"
-    if not os.path.exists(save_out):
-        os.makedirs(save_out)
-    save_img(img_grayscale, save_out + img_name + "_grayscale", use_JPEG)
+    # grayscale TOO EASY
+    # img_grayscale = rgb2gray(img)
+    # if out_dir:
+    #     save_out = out_dir + "/"
+    # save_out = out_dir + "degradations/" + "grayscale/"
+    # if not os.path.exists(save_out):
+    #     os.makedirs(save_out)
+    # save_img(img_grayscale, save_out + img_name + "_grayscale", use_JPEG)
 
     # contrast
-    for contrast_level in [x/10 for x in range(1, 11)]:
+    contrast_levels = [0.01,0.03,0.05,0.10,0.15,0.3,0.5,1]
+    for contrast_level in contrast_levels:
         img_contrast = grayscale_contrast(image=img,
                                           contrast_level=contrast_level)
         if out_dir:
             save_out = out_dir + "/"
-        save_out = out_dir + "degradations/contrast_" + str(contrast_level) + "/"
+        save_out = out_dir + "degradations/contrast/c" + str(contrast_level) + "/"
         if not os.path.exists(save_out):
             os.makedirs(save_out)
         save_img(img_contrast, save_out + img_name + "_c" + str(contrast_level).replace(".", ""), use_JPEG)
 
 
-    # noise
-    noise_widths = [x/10 for x in range(1, 11)]
-    contrast_levels = [x/10 for x in range(1, 11)]
+    # uniform noise with reduced contrast 30%
+    noise_widths = [0,0.03,0.05,0.1,0.2,0.35,0.6,0.9]
+    contrast_level = 0.3
     rng = np.random.RandomState(seed=42)
     for noise_width in noise_widths:
-        for contrast_level in contrast_levels:
-            img_noisy = uniform_noise(image=img, width=noise_width,
-                              contrast_level=contrast_level,
-                              rng=rng)
-            if out_dir:
-                save_out = out_dir + "/"
-            save_out = out_dir + "degradations/noise_" + str(noise_width) + "_c_" + str(contrast_level) + "/"
-            if not os.path.exists(save_out):
-                os.makedirs(save_out)
-            save_img(img_noisy, save_out + img_name + "_n" + str(noise_width).replace(".", "") + "_c" + str(contrast_level).replace(".", ""), use_JPEG)
+        img_noisy = uniform_noise(image=img, width=noise_width,
+                            contrast_level=contrast_level,
+                            rng=rng)
+        if out_dir:
+            save_out = out_dir + "/"
+        save_out = out_dir + "degradations/noise/nw" + str(noise_width) + "_c_" + str(contrast_level) + "/"
+        if not os.path.exists(save_out):
+            os.makedirs(save_out)
+        save_img(img_noisy, save_out + img_name + "_nw" + str(noise_width).replace(".", "") + "_c" + str(contrast_level).replace(".", ""), use_JPEG)
 
     # high-pass
-    std = 3
-    img_highpass = high_pass_filter(img, std) 
-    if out_dir:
-        save_out = out_dir + "/"
-    save_out = out_dir + "degradations/highpass" + "/"
-    if not os.path.exists(save_out):
-        os.makedirs(save_out)
-    save_img(img_highpass, save_out + img_name + "_highpass", use_JPEG)
+    stds = [0.4,0.45,0.55,0.7,1,1.5,3,999]
+    for std in stds:
+        img_highpass = high_pass_filter(img, std) 
+        if out_dir:
+            save_out = out_dir + "/"
+        save_out = out_dir + "degradations/highpass/sd"  + str(std) + "/"
+        if not os.path.exists(save_out):
+            os.makedirs(save_out)
+        save_img(img_highpass, save_out + img_name + "_sd" + str(std) + "_highpass", use_JPEG)
+
+    
 
     # low-pass
-    std =10
-    img_lowpass = low_pass_filter(img, std) 
-    if out_dir:
-        save_out = out_dir + "/"
-    save_out = out_dir + "degradations/lowpass" + "/"
-    if not os.path.exists(save_out):
-        os.makedirs(save_out)
-    save_img(img_lowpass, save_out + img_name + "_lowpass", use_JPEG)
+    stds = [0,1,3,5,7,10,15,40]
+    for std in stds:
+        img_lowpass = low_pass_filter(img, std) 
+        if out_dir:
+            save_out = out_dir + "/"
+        save_out = out_dir + "degradations/lowpass/sd"  + str(std) + "/"
+        if not os.path.exists(save_out):
+            os.makedirs(save_out)
+        save_img(img_lowpass, save_out + img_name + "_sd" + str(std) + "_lowpass", use_JPEG)
 
 
-    # phase-scrambling
+    #phase-scrambling
     # width = 90
     # img_phase_scrambling = phase_scrambling(img, width) 
     # if out_dir:
@@ -771,11 +775,13 @@ def degrade_images(img_path, out_dir=""):
     # save_out = out_dir + "degradations/phase_scrambling" + "/"
     # if not os.path.exists(save_out):
     #     os.makedirs(save_out)
-    # save_img(img_phase_scrambling, save_out + img_name + "phase_scrambling", use_JPEG)
+    # save_img(img_phase_scrambling, save_out + img_name + "_phase", use_JPEG)
 
 
 
 degrade_images("../../ILSVRC2012_img_train/n02085620_574.JPEG")
+# degrade_images("../../ILSVRC2012_img_train/n02690373_10001.JPEG") # does work for phase
+
 
 if __name__ == "__main__":
     pass
