@@ -728,16 +728,12 @@ def load_image(img_name):
         return img
     except FileNotFoundError:
         file_ending = os.path.splitext(img_name)[1]
-        print(file_ending)
         img_name = os.path.splitext(img_name)[0]
-        print(img_name)
         if file_ending == ".png":
             file_ending = ".JPEG"
         elif file_ending == ".JPEG":
             file_ending = ".png"
-        print(file_ending)
         img_path = "../../ILSVRC2012_img_train/" + img_name + file_ending
-        print(img_path)
         img = imload_rgb(img_path)
         return img
     # except:
@@ -858,8 +854,8 @@ if __name__ == "__main__":
     pass
 else:
 
-    print("""This main method should generate manipulated
-           images in the directory where it was executed.""")
+    # print("""This main method should generate manipulated
+        #    images in the directory where it was executed.""")
 
     use_JPEG = False # either JPEG or PNG
     img = imload_rgb("test_image.JPEG")

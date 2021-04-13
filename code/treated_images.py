@@ -59,13 +59,13 @@ def existence_treated_images():
     """
     pass
 
-
 if not os.path.exists("treated_images/"):
     os.makedirs("treated_images/")
-
 print("dir made")
+
 #apply image degradation:
 counter = 0
+dc_truth_response = dict()
 out_dir = "treated_images/"
 for image in treated_images:
     # if image does not already exist in target directory do the following #TODO
@@ -100,11 +100,13 @@ for image in treated_images:
             lvl = float(image[3].strip("lp"))
             img = lowpass(img, lvl)
             exp = "lp"
-
+        ground_truth = image[1]
+        prediction = image[-2]
         
-        image_file = f"{counter}_{exp}_dnn_{image[3]}_gt{image[1]}_pred{image[-2]}_{raw_img_name}"
+        image_file = f"{counter}_{exp}_dnn_{image[3]}_gt{ground_truth}_pred{prediction}_{raw_img_name}"
+        dc_truth_response[f"{raw_img_name}"] = (ground_truth, prediction, ground_truth==prediction)
         # print(image_file)
-        imgdata = np.asarray(img)
+        # imgdata = np.asarray(img)
         save_img(img, out_dir + image_file, use_JPEG=False)
         # print("processed image number", counter)
         counter += 1
@@ -114,4 +116,17 @@ for image in treated_images:
 
 print(counter)
 
-    # apply correct exp and condition
+# in dict, count no of ground truth categories
+distr = dict()
+for i in dc_truth_response.values():
+    if not i[0] in distr:
+        distr[f"{i[0]}"] = 1
+    else:
+        distr[f"{i[0]}"] += 1
+
+for key, value in distr.items():
+    print(f"{key}: {value} occurences")
+
+# iterate through dict and count how often there is agreement btw ground truth and prediction
+
+# output table to see agreement for each category
